@@ -19,7 +19,7 @@ public class Tool extends Sprite{
 	
 	private void initMovement(){
 		floorDownMovementAction = new MovementActionSet();
-		MovementActionInfo info = new MovementActionInfo(5000, 200, 2, 10, "", null, true, this, Rabbit_action.RJump.getName());
+		MovementActionInfo info = new MovementActionInfo(5000, 200, 2, 10, "", this, Rabbit_action.RJump.getName());
 		floorDownMovementAction.addMovementAction(new MovementActionItemBaseReugularFPS(info));
 		floorDownMovementAction.setActionListener(new IActionListener() {
 			

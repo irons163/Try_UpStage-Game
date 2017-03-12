@@ -6,6 +6,7 @@ import android.view.SurfaceHolder;
 import android.view.Window;
 
 import com.example.try_gameengine.framework.GameController;
+import com.example.try_gameengine.framework.GameView;
 import com.example.try_gameengine.framework.IGameModel;
 import com.example.try_upstage.utils.BitmapUtil;
 import com.example.try_upstage.utils.Common;
@@ -27,9 +28,9 @@ public class MyGameController extends GameController{
 	}
 
 	@Override
-	protected void initGameView(Activity activity, IGameModel gameModel) {
+	protected GameView initGameView(Activity activity, IGameModel gameModel) {
 		// TODO Auto-generated method stub
-		gameView = new MyGameView(activity, this, gameModel);
+		return gameView = new MyGameView(activity, this, gameModel);
 	}
 
 	@Override
@@ -41,7 +42,7 @@ public class MyGameController extends GameController{
 	@Override
 	protected void setActivityContentView(Activity activity) {
 		// TODO Auto-generated method stub
-//		activity.requestWindowFeature(Window.FEATURE_NO_TITLE); // µL¼ÐÃD
+//		activity.requestWindowFeature(Window.FEATURE_NO_TITLE); // ï¿½Lï¿½ï¿½ï¿½D
 		activity.setContentView(gameView);
 		
 //		DisplayMetrics dm = new DisplayMetrics();

@@ -87,7 +87,7 @@ public class Player extends Sprite{
 	private void initMovement(){
 		jumpMovement = new MovementActionSet();
 		jumpMovement.setMovementActionController(new MovementAtionController());
-		MovementActionInfo info = new MovementActionInfo(50, 5, 2, -160, "", null, true, this, Rabbit_action.RJump.getName());
+		MovementActionInfo info = new MovementActionInfo(50, 5, 2, -160, "", this, Rabbit_action.RJump.getName());
 		jumpMovement.addMovementAction(new MovementActionItemBaseReugularFPS(info));
 		jumpMovement.setActionListener(new IActionListener() {
 			
@@ -136,7 +136,7 @@ public class Player extends Sprite{
 		
 		
 		jumpLMovement = new MovementActionSet();
-		info = new MovementActionInfo(5000, 200, -2, 10, "", null, true, this, Rabbit_action.LJump.getName());
+		info = new MovementActionInfo(5000, 200, -2, 10, "", this, Rabbit_action.LJump.getName());
 		jumpLMovement.addMovementAction(new MovementActionItemBaseReugularFPS(info));
 		jumpLMovement.setActionListener(new IActionListener() {
 			
@@ -208,10 +208,10 @@ public void drawSelf(Canvas canvas, Paint paint) {
 public void draw(Canvas canvas, float dy, float dx) {
 		
 		float y = getY(); 
-		y -= dy; //®y¼ÐyÅÜ¤p¡A¥Nªí¹Ï¤ù©¹¥ª²¾
+		y -= dy; //ï¿½yï¿½ï¿½yï¿½Ü¤pï¿½Aï¿½Nï¿½ï¿½Ï¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		setY(y);
 		float x = getX(); 
-		x -= dx; //®y¼ÐxÅÜ¤p¡A¥Nªí¹Ï¤ù©¹¤W²¾
+		x -= dx; //ï¿½yï¿½ï¿½xï¿½Ü¤pï¿½Aï¿½Nï¿½ï¿½Ï¤ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½
 		setX(x);
 		
 		if(isInjure){
@@ -234,9 +234,9 @@ public void draw(Canvas canvas, float dy, float dx) {
 			drawSelf(canvas, null);
 			walkCount = 0;
 			
-		//¦pªG¦ì²¾µ¥©óslide³t«×¡A¥Nªíª±®a¨Ã¨S¦³²¾°Ê¡A¥u¬O¦aªO¦b¨Ï¤Hª«°Ê¡A¦]¦¹­n¥ÎÀR¤î¹Ï(walkBitmap02)
-		//¦ý¬O¦¹¤èªkªº¯ÊÂI¬O¡ASLIDERSPEED¤£¯à­è¦n¬OMoveSpeedªº¨â­¿¡A
-		//§_«h·íª±®a¦b²¾°Ê®É MoveSpeed - SLIDERSPEED = SLIDERSPEED ·|¾É­P»~§P¬°ÀR¤î¡C
+		//ï¿½pï¿½Gï¿½ì²¾ï¿½ï¿½ï¿½ï¿½slideï¿½tï¿½×¡Aï¿½Nï¿½ï¿½ï¿½aï¿½Ã¨Sï¿½ï¿½ï¿½ï¿½ï¿½Ê¡Aï¿½uï¿½Oï¿½aï¿½Oï¿½bï¿½Ï¤Hï¿½ï¿½ï¿½Ê¡Aï¿½]ï¿½ï¿½ï¿½nï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½(walkBitmap02)
+		//ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½kï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½Oï¿½ASLIDERSPEEDï¿½ï¿½ï¿½ï¿½ï¿½nï¿½OMoveSpeedï¿½ï¿½ï¿½â­¿ï¿½A
+		//ï¿½_ï¿½hï¿½ï¿½ï¿½aï¿½bï¿½ï¿½ï¿½Ê®ï¿½ MoveSpeed - SLIDERSPEED = SLIDERSPEED ï¿½|ï¿½É­Pï¿½~ï¿½Pï¿½ï¿½ï¿½Rï¿½ï¿½C
 		}else if(MyGameModel.SLIDERSPEED==Math.abs(dx)){
 			bitmap = walkBitmap02;
 //			canvas.drawBitmap(bitmap, x, y, null);

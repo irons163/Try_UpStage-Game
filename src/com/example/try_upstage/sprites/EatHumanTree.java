@@ -100,7 +100,7 @@ public class EatHumanTree extends Sprite{
 	private void initMovement(){
 		jumpMovement = new MovementActionSet();
 		jumpMovement.setMovementActionController(new MovementAtionController());
-		MovementActionInfo info = new MovementActionInfo(50, 5, 2, -160, "", null, true, this, EatHumanTree_Action.Eat.getName());
+		MovementActionInfo info = new MovementActionInfo(50, 5, 2, -160, "", this, EatHumanTree_Action.Eat.getName());
 		jumpMovement.addMovementAction(new MovementActionItemBaseReugularFPS(info));
 		jumpMovement.setActionListener(new IActionListener() {
 			
