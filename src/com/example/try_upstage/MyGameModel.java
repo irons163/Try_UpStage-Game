@@ -47,8 +47,8 @@ public class MyGameModel extends GameModel {
 	final static int SMOOTH_DEVIATION = 4;
 	public static ToolUtil toolExplodingUtil;
 	float playerMoveSpeed = 0;
-	public static final float MOVESPEED = (float)Common.screenWidth/66;
-	public static final float SLIDERSPEED = MOVESPEED/3;
+	public static final float MOVESPEED = (float) Common.screenWidth / 66;
+	public static final float SLIDERSPEED = MOVESPEED / 3;
 	boolean playerDownOnFootBoard = false;
 	boolean playerStandOnFootboard = false;
 	private int move = 0;
@@ -56,15 +56,14 @@ public class MyGameModel extends GameModel {
 	public static final int RIGHT = 2;
 	int whichFoorbar = 0;
 	int life = 90;
-	public final float DOWNSPEED = BASE_SPEED*5;
+	public final float DOWNSPEED = BASE_SPEED;
 	Paint paint = new Paint();
 	ArrayList<FireBall> fireballs = new ArrayList<FireBall>();
 	boolean isPressLeftMoveBtn, isPressRightMoveBtn;
 	Controler controler;
-	
+
 	public MyGameModel(Context context, Data data) {
 		super(context, data);
-		// TODO Auto-gener1ted constructor stub
 		background = new Background(BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.background2));
 		background.setPosition(0, 0);
@@ -74,401 +73,349 @@ public class MyGameModel extends GameModel {
 		floor.setBitmapAndAutoChangeWH(BitmapUtil.floor);
 
 		floors.add(floor);
+		footboardWidth = (int) Common.screenWidth
+				/ BitmapUtil.FOOTBOARD_WIDTH_PERSENT;
+		footboardHeight = (int) ((float) BitmapUtil.footboard_normal_bitmap
+				.getHeight() / BitmapUtil.footboard_normal_bitmap.getWidth() * footboardWidth);
 
-//		footboardHeight = floor.h;
-//
-//		footboardWidth = floor.w;
-
-		footboardWidth = (int) Common.screenWidth / BitmapUtil.FOOTBOARD_WIDTH_PERSENT;
-		footboardHeight = (int)((float)BitmapUtil.footboard_normal_bitmap.getHeight()
-				/ BitmapUtil.footboard_normal_bitmap.getWidth() * footboardWidth);
-		
 		width = Common.screenWidth;
 		height = Common.screenHeight;
 
 		currentXs.add(currentX);
 
 		createFloor();
+		initPlayer();
 
-		player = new Player(200, 50, false);
-		player.setPosition(200, 200);
-		player.setBitmapAndAutoChangeWH(BitmapFactory.decodeResource(
-				context.getResources(), R.drawable.frog_down));
-		
-		player.updateBitmap(LEFT);
-		
 		this.controler = new Controler(context, this.getHeight(),
 				this.getWidth());
 	}
 
+	public void initFool() {
+
+	}
+
+	public void initPlayer() {
+		player = new Player(200, 50, false);
+		player.setPosition(200, 800);
+		player.setBitmapAndAutoChangeWH(BitmapFactory.decodeResource(
+				context.getResources(), R.drawable.frog_down));
+
+		player.updateBitmap(LEFT);
+	}
+
 	@Override
 	protected void doDraw(Canvas canvas) {
-		// TODO Auto-generated method stub
 		super.doDraw(canvas);
-		
+
 		boolean isInjure = false;
 		boolean isDrawPlayer = true;
-
 		background.draw(canvas);
-		
 		controler.paint(canvas);
 
-//		for (Floor floor : floors) {
-//			floor.drawSelf(canvas, null);
-//		}
-
-//		for (ArrayList<Floor> floors : footboards) {
-//			for (Floor floor : floors) {
-//				floor.drawSelf(canvas, null);
-//			}
-//		}
-
-//		player.drawSelf(canvas, null);
-		
-		
 		float footboardByPlayerX, footboardByPlayerY = 0;
-		
 		int re = 0;
 
 		playerStandOnFootboard = false;
-		for (int j = 0; j < footboards.size(); j++) {	
+		for (int j = 0; j < footboards.size(); j++) {
 			ArrayList<Floor> f = footboards.get(j);
 			for (int k = 0; k < f.size(); k++) {
 				boolean remove = false;
 				Floor ene = f.get(k);
-			int i = new Random().nextInt(20);
-			// if (i == 0) {
-			// Bitmap bulle = BitmapFactory.decodeResource(
-			// this.getResources(), R.drawable.bullet);
-			// bull = new Bullet(ene.getX()+9, ene.getY()+31, bulle,time);
-			// ebullets.add(bull);
-			// }
-			ToolUtil toolUtil = null;
-			EatHumanTree eatHumanTree = null;
-			if (ene.toolNum == Floor.NOTOOL) {
-				toolUtil = null;
-			} else if (ene.toolNum == Floor.BOMB) {
-				toolUtil = new ToolUtil(ene.getX(), ene.getY(), Floor.BOMB);
-//				toolUtil.draw(canvas, SPEED);
-			} else if (ene.toolNum == Floor.BOMB_EXPLODE) {
 
-			} else if (ene.toolNum == Floor.EAT_HUMAN_TREE) {
-				eatHumanTree = ene.eatHumanTree;
-			} else {
-				toolUtil = new ToolUtil(ene.getX(), ene.getY(), Floor.CURE);
-//				toolUtil.draw(canvas, SPEED);
-			}
-
-			int a = (int) (player.getY() + player.getHeight());
-			if ((ene.getY()) >= (int) (player.getY() + player.getHeight())) {
-				Log.e("b", "a");
-			}
-			if (ene.getY() < player.getY() + player.getHeight() + 10) {
-				Log.e("c", "a");
-			}
-			if (ene.getY() >= player.getY() + player.getHeight() - 60) {
-				Log.e("c", "ene.getY()" + ene.getY() + "player.getY() + player.h" + (player.getY() + player.getHeight()));
-				Log.e("d", "ene.getY()" + ene.getY() + "player.getY() + player.h + DOWNSPEED + SPEED" + (player.getY()
-						+ player.getHeight() + DOWNSPEED + SPEED));
-			}
-
-			//ene.getY() >= player.getY() + player.h -1 ?敺?-1?臬??箸筑暺??嚗???撠?.000X??
-			if ((ene.getX() < player.getX() + player.getWidth() - SMOOTH_DEVIATION*4)
-					&& (ene.getX() + footboardWidth > player.getX() + SMOOTH_DEVIATION*4)
-					&& (ene.getY() >= player.getY() + player.getHeight() -1 && ene.getY() < player.getY()
-							+ player.getHeight() + DOWNSPEED + SPEED)) {
-						
-				if (toolUtil != null
-						&& (toolUtil.tool_x < player.getX() + player.getWidth() -SMOOTH_DEVIATION*4)
-						&& (toolUtil.tool_x + toolUtil.tool_width > player.getX() +SMOOTH_DEVIATION*4)
-						&& ene.toolNum != Floor.BOMB_EXPLODE) {
-					if (ene.toolNum == Floor.BOMB) {
-						isInjure = true;
-						ene.toolNum = Floor.BOMB_EXPLODE;
-						toolExplodingUtil = new ToolUtil(ene.getX(), ene.getY(), Floor.BOMB_EXPLODE);
-						life -= 60;
-						if (life < 0) {
-							life = 0;
-						}
-					} else if (ene.toolNum == Floor.CURE){
-						life = 90;
-						ene.toolNum = Floor.NOTOOL;
-					} 		
-					
-				}
-				
-				if(eatHumanTree != null && (eatHumanTree.getX() < player.getX() + player.getWidth() -SMOOTH_DEVIATION*4)
-						&& (eatHumanTree.getX() + eatHumanTree.getWidth() > player.getX() +SMOOTH_DEVIATION*4)
-						){
-					if(eatHumanTree.eatStartAndDetectHurtPlayer()){
-						isInjure = true;
-						life -= 30;
-						if (life < 0) {
-							life = 0;
-						}
-						paint.setColor(Color.RED);
-						paint.setAlpha(100);
-						Rect rect6 = new Rect(0, 0, width, height);
-						canvas.drawRect(rect6, paint);
-					}
-				}
-
-				if (playerDownOnFootBoard) {
-					whichFoorbar = 0;
-					// move = 0;
-					playerMoveSpeed = 0;
-					if (ene.which == 5) {
-						isInjure = true;
-						life -= 30;
-						if (life < 0) {
-							life = 0;
-						}
-						paint.setColor(Color.RED);
-						paint.setAlpha(100);
-						Rect rect6 = new Rect(0, 0, width, height);
-						canvas.drawRect(rect6, paint);
-					}
-
-//					if (ene.which == 4) {
-//						ene.bitmap = null;
-//					}
-
-					if (ene.which == 1) {
-						whichFoorbar = 1;
-						// move = LEFT;
-						// move = 0;
-						playerMoveSpeed = SLIDERSPEED;
-					} else if (ene.which == 2) {
-						whichFoorbar = 2;
-						// move = RIGHT;
-						// move = 0;
-						playerMoveSpeed = -SLIDERSPEED;
-					}
-				}
-
-				// if (ene.which == 1) {
-				// whichFoorbar = ene.which;
-				// move = LEFT;
-				// playerMoveSpeed = SLIDERSPEED;
-				// } else if (ene.which == 2) {
-				// whichFoorbar = ene.which;
-				// move = RIGHT;
-				// playerMoveSpeed = -SLIDERSPEED;
-				// }
-
-				playerStandOnFootboard = true;
-				footboardByPlayerY = ene.getY();
-				player.setY(footboardByPlayerY - player.getHeight());
-				// move=0;
-				ene.setCount();
-				playerDownOnFootBoard = false;
-				// playerDownOnFootBoard = false;
-			}
-			// else{
-			// playerStandOnFootboard=false;
-			// }
-
-			if(ene.toolNum == Floor.BOMB_EXPLODE && toolExplodingUtil!=null){
-				if(toolExplodingUtil.isExploding){
+				ToolUtil toolUtil = null;
+				EatHumanTree eatHumanTree = null;
+				if (ene.toolNum == Floor.NOTOOL) {
 					toolUtil = null;
-					if(isDrawPlayer){
-						isDrawPlayer = false;
-						player.draw(canvas, SPEED, 0, isInjure);
-						toolExplodingUtil.draw(canvas, SPEED);
+				} else if (ene.toolNum == Floor.BOMB) {
+					toolUtil = new ToolUtil(ene.getX(), ene.getY(), Floor.BOMB);
+					// toolUtil.draw(canvas, SPEED);
+				} else if (ene.toolNum == Floor.BOMB_EXPLODE) {
+
+				} else if (ene.toolNum == Floor.EAT_HUMAN_TREE) {
+					eatHumanTree = ene.eatHumanTree;
+				} else {
+					toolUtil = new ToolUtil(ene.getX(), ene.getY(), Floor.CURE);
+					// toolUtil.draw(canvas, SPEED);
+				}
+
+				if ((ene.getX() < player.getX() + player.getWidth()
+						- SMOOTH_DEVIATION * 4)
+						&& (ene.getX() + footboardWidth > player.getX()
+								+ SMOOTH_DEVIATION * 4)
+						&& (ene.getY() >= player.getY() + player.getHeight()
+								- 1 && ene.getY() < player.getY()
+								+ player.getHeight() + DOWNSPEED + SPEED)) {
+
+					if (toolUtil != null
+							&& (toolUtil.tool_x < player.getX()
+									+ player.getWidth() - SMOOTH_DEVIATION * 4)
+							&& (toolUtil.tool_x + toolUtil.tool_width > player
+									.getX() + SMOOTH_DEVIATION * 4)
+							&& ene.toolNum != Floor.BOMB_EXPLODE) {
+						if (ene.toolNum == Floor.BOMB) {
+							isInjure = true;
+							ene.toolNum = Floor.BOMB_EXPLODE;
+							toolExplodingUtil = new ToolUtil(ene.getX(),
+									ene.getY(), Floor.BOMB_EXPLODE);
+							life -= 60;
+							if (life < 0) {
+								life = 0;
+							}
+						} else if (ene.toolNum == Floor.CURE) {
+							life = 90;
+							ene.toolNum = Floor.NOTOOL;
+						}
+
 					}
-				}else{
-					toolExplodingUtil = null;
-					ene.toolNum = Floor.NOTOOL;
+
+					if (eatHumanTree != null
+							&& (eatHumanTree.getX() < player.getX()
+									+ player.getWidth() - SMOOTH_DEVIATION * 4)
+							&& (eatHumanTree.getX() + eatHumanTree.getWidth() > player
+									.getX() + SMOOTH_DEVIATION * 4)) {
+						if (eatHumanTree.eatStartAndDetectHurtPlayer()) {
+							isInjure = true;
+							life -= 30;
+							if (life < 0) {
+								life = 0;
+							}
+							paint.setColor(Color.RED);
+							paint.setAlpha(100);
+							Rect rect6 = new Rect(0, 0, width, height);
+							canvas.drawRect(rect6, paint);
+						}
+					}
+
+					if (playerDownOnFootBoard) {
+						whichFoorbar = 0;
+						playerMoveSpeed = 0;
+						if (ene.which == 5) {
+							isInjure = true;
+							life -= 30;
+							if (life < 0) {
+								life = 0;
+							}
+							paint.setColor(Color.RED);
+							paint.setAlpha(100);
+							Rect rect6 = new Rect(0, 0, width, height);
+							canvas.drawRect(rect6, paint);
+						}
+						if (ene.which == 1) {
+							whichFoorbar = 1;
+							playerMoveSpeed = SLIDERSPEED;
+						} else if (ene.which == 2) {
+							whichFoorbar = 2;
+							playerMoveSpeed = -SLIDERSPEED;
+						}
+					}
+
+					playerStandOnFootboard = true;
+					footboardByPlayerY = ene.getY();
+					player.setY(footboardByPlayerY - player.getHeight());
+					ene.setCount();
+					playerDownOnFootBoard = false;
+				}
+
+				if (ene.toolNum == Floor.BOMB_EXPLODE
+						&& toolExplodingUtil != null) {
+					if (toolExplodingUtil.isExploding) {
+						toolUtil = null;
+						if (isDrawPlayer) {
+							isDrawPlayer = false;
+							player.draw(canvas, SPEED, 0, isInjure);
+							toolExplodingUtil.draw(canvas, SPEED);
+						}
+					} else {
+						toolExplodingUtil = null;
+						ene.toolNum = Floor.NOTOOL;
+					}
+				}
+
+				if (toolUtil != null) {
+					toolUtil.draw(canvas, SPEED);
+				}
+
+				if (eatHumanTree != null) {
+					eatHumanTree.move(0, SPEED);
+					eatHumanTree.drawSelf(canvas, paint);
+				}
+
+				if (ene.getY() > 0 - SPEED && ene.drawBitmap != null) {
+					ene.draw(canvas, SPEED);
+				} else {
+					remove = true;
+					re = k;
+				}
+
+				if (remove) {
+					f.remove(re);
+					k--;
 				}
 			}
-			
-			if(toolUtil != null){
-				toolUtil.draw(canvas, SPEED);
-			}
-			
-			if(eatHumanTree!=null){
-				eatHumanTree.move(0, SPEED);
-				eatHumanTree.drawSelf(canvas, paint);
-			}
-			
-			if (ene.getY() > 0 - SPEED && ene.drawBitmap != null) {
-				ene.draw(canvas, SPEED);
-			} else {
-				remove = true;
-				re = k;
-			}
-			
-			if (remove) {
-				f.remove(re);
-				k--;
-			}
 		}
-		}
-
-
 
 		Bitmap bitmap = BitmapUtil.top_spiked_bar;
-//		canvas.drawBitmap(bitmap, 0, 0, null);
-		float topSpikedBarHeight = (float)bitmap.getHeight()/bitmap.getWidth() * width;
-		RectF rectTopSpikedBar = new RectF(0, 0, width,
-				topSpikedBarHeight);
+		float topSpikedBarHeight = (float) bitmap.getHeight()
+				/ bitmap.getWidth() * width;
+		RectF rectTopSpikedBar = new RectF(0, 0, width, topSpikedBarHeight);
 		canvas.drawBitmap(bitmap, null, rectTopSpikedBar, null);
-		
+
 		if (topSpikedBarHeight >= player.getY()) {
 			isInjure = true;
 			life = 0;
 		}
-		
-		float playerDy=0;
-		float playerDx=0;
-		if(isDrawPlayer){
 
-		
-		if (playerStandOnFootboard) {
-			Log.e("d", "a");
-
-			if (move == LEFT) {
-
-				if (player.getX() <= 0) {
-					playerDy = SPEED;
-					playerDx = 0;
-//					player.draw(canvas, SPEED, 0, isInjure);
-					move = 0;
+		float playerDy = 0;
+		float playerDx = 0;
+		if (isDrawPlayer) {
+			if (playerStandOnFootboard) {
+				if (move == LEFT) {
+					if (player.getX() <= 0) {
+						playerDy = SPEED;
+						playerDx = 0;
+						// player.draw(canvas, SPEED, 0, isInjure);
+						move = 0;
+					} else {
+						playerDy = SPEED;
+						playerDx = MOVESPEED + playerMoveSpeed;
+						// player.draw(canvas, SPEED, MOVESPEED +
+						// playerMoveSpeed, isInjure);
+					}
+				} else if (move == RIGHT) {
+					if (player.getX() + player.getWidth() >= width) {
+						playerDy = SPEED;
+						playerDx = 0;
+						// player.draw(canvas, SPEED, 0, isInjure);
+						move = 0;
+					} else {
+						playerDy = SPEED;
+						playerDx = -MOVESPEED + playerMoveSpeed;
+						// player.draw(canvas, SPEED, -MOVESPEED +
+						// playerMoveSpeed, isInjure);
+					}
 				} else {
-					playerDy = SPEED;
-					playerDx = MOVESPEED + playerMoveSpeed;
-//					player.draw(canvas, SPEED, MOVESPEED + playerMoveSpeed, isInjure);
-				}
-			} else if (move == RIGHT) {
-				if (player.getX() + player.getWidth() >= width) {
-					playerDy = SPEED;
-					playerDx = 0;
-//					player.draw(canvas, SPEED, 0, isInjure);
-					move = 0;
-				} else {
-					playerDy = SPEED;
-					playerDx = -MOVESPEED + playerMoveSpeed;
-//					player.draw(canvas, SPEED, -MOVESPEED + playerMoveSpeed, isInjure);
-				}
-			} else {
-				if (whichFoorbar == 1) {
-					playerDy = SPEED;
-					playerDx = playerMoveSpeed;
-//					player.draw(canvas, SPEED, playerMoveSpeed, isInjure);
-				} else if (whichFoorbar == 2) {
-					playerDy = SPEED;
-					playerDx = playerMoveSpeed;
-//					player.draw(canvas, SPEED, playerMoveSpeed, isInjure);
-				} else {
-					playerDy = SPEED;
-					playerDx = 0;
-//					player.draw(canvas, SPEED, 0, isInjure);
-				}
-
-			}
-
-		} else {
-
-			if (move == LEFT) {
-				if (player.getX() <= 0) {
-					playerDy = -DOWNSPEED;
-					playerDx = 0;
-//					player.draw(canvas, -DOWNSPEED, 0, isInjure);
-					move = 0;
-				} else {
-					playerDy = -DOWNSPEED;
-					playerDx = 8;
-//					player.draw(canvas, -DOWNSPEED, 8, isInjure);
-				}
-			} else if (move == RIGHT) {
-				if (player.getX() + player.getWidth() >= width) {
-					playerDy = -DOWNSPEED;
-					playerDx = 0;
-//					player.draw(canvas, -DOWNSPEED, 0, isInjure);
-					move = 0;
-				} else {
-					playerDy = -DOWNSPEED;
-					playerDx = -8;
-//					player.draw(canvas, -DOWNSPEED, -8, isInjure);
+					if (whichFoorbar == 1) {
+						playerDy = SPEED;
+						playerDx = playerMoveSpeed;
+						// player.draw(canvas, SPEED, playerMoveSpeed,
+						// isInjure);
+					} else if (whichFoorbar == 2) {
+						playerDy = SPEED;
+						playerDx = playerMoveSpeed;
+						// player.draw(canvas, SPEED, playerMoveSpeed,
+						// isInjure);
+					} else {
+						playerDy = SPEED;
+						playerDx = 0;
+						// player.draw(canvas, SPEED, 0, isInjure);
+					}
 				}
 			} else {
-				playerDy = -DOWNSPEED;
-				playerDx = 0;
-//				player.draw(canvas, -DOWNSPEED, 0, isInjure);
+				if (move == LEFT) {
+					if (player.getX() <= 0) {
+						playerDy = -DOWNSPEED;
+						playerDx = 0;
+						// player.draw(canvas, -DOWNSPEED, 0, isInjure);
+						move = 0;
+					} else {
+						playerDy = -DOWNSPEED;
+						playerDx = 8;
+						// player.draw(canvas, -DOWNSPEED, 8, isInjure);
+					}
+				} else if (move == RIGHT) {
+					if (player.getX() + player.getWidth() >= width) {
+						playerDy = -DOWNSPEED;
+						playerDx = 0;
+						// player.draw(canvas, -DOWNSPEED, 0, isInjure);
+						move = 0;
+					} else {
+						playerDy = -DOWNSPEED;
+						playerDx = -8;
+						// player.draw(canvas, -DOWNSPEED, -8, isInjure);
+					}
+				} else {
+					playerDy = -DOWNSPEED;
+					playerDx = 0;
+					// player.draw(canvas, -DOWNSPEED, 0, isInjure);
+				}
+				playerDownOnFootBoard = true;
 			}
-			playerDownOnFootBoard = true;
 		}
-		}
-	
+
 		for (int i = 0; i < fireballs.size(); i++) {
-			FireBall ball = fireballs.get(i);		
+			FireBall ball = fireballs.get(i);
 			if (player.getY() < ball.y + ball.fireballHeight
 					&& player.getY() > ball.y
-					&& player.getX() + player.getWidth() > ball.x + SMOOTH_DEVIATION
-					&& player.getX() < ball.x + ball.fireballWidth - SMOOTH_DEVIATION) {
+					&& player.getX() + player.getWidth() > ball.x
+							+ SMOOTH_DEVIATION
+					&& player.getX() < ball.x + ball.fireballWidth
+							- SMOOTH_DEVIATION) {
 				isInjure = true;
 				life = 0;
-				if(isDrawPlayer){
+				if (isDrawPlayer) {
 					isDrawPlayer = false;
 					player.draw(canvas, playerDy, playerDx, isInjure);
 				}
 			}
 			ball.draw(canvas, -(SPEED + SPEED), 0);
 		}
-		
-		if(isDrawPlayer){
+
+		if (isDrawPlayer) {
 			player.draw(canvas, playerDy, playerDx, isInjure);
 		}
-
-//		paint.setColor(Color.GRAY);
-//		Rect rect5 = new Rect(width - 120, 60, width - 30, 80);
-//		canvas.drawRect(rect5, paint);
-//		paint.setColor(Color.RED);
-//		Rect rect4 = new Rect(width - 120, 60, width - 120 + life, 80);
-//		canvas.drawRect(rect4, paint);
 		int lifeBarX = 0;
 		Bitmap lifeBgBmp = BitmapUtil.life_bg;
 		Bitmap lifeBmp = BitmapUtil.life;
-		RectF rect5 = new RectF(width - lifeBarX - lifeBgBmp.getWidth(), topSpikedBarHeight, width - lifeBarX , topSpikedBarHeight+lifeBgBmp.getHeight());
+		RectF rect5 = new RectF(width - lifeBarX - lifeBgBmp.getWidth(),
+				topSpikedBarHeight, width - lifeBarX, topSpikedBarHeight
+						+ lifeBgBmp.getHeight());
 		canvas.drawBitmap(lifeBgBmp, null, rect5, null);
-		int w = lifeBmp.getWidth();
-		int ww = ((lifeBmp.getWidth()*(life/30))/3);
-		RectF rect4 = new RectF(width - lifeBarX - ((lifeBmp.getWidth()*(life/30))/3) - (((float)(lifeBgBmp.getWidth() - lifeBmp.getWidth())/2)), topSpikedBarHeight+(((float)(lifeBgBmp.getHeight() - lifeBmp.getHeight())/2)), width - lifeBarX - (((float)(lifeBgBmp.getWidth() - lifeBmp.getWidth())/2)), topSpikedBarHeight+ lifeBmp.getHeight()+(((float)(lifeBgBmp.getHeight() - lifeBmp.getHeight())/2)));
+		RectF rect4 = new RectF(
+				width
+						- lifeBarX
+						- ((lifeBmp.getWidth() * (life / 30)) / 3)
+						- (((float) (lifeBgBmp.getWidth() - lifeBmp.getWidth()) / 2)),
+				topSpikedBarHeight
+						+ (((float) (lifeBgBmp.getHeight() - lifeBmp
+								.getHeight()) / 2)),
+				width
+						- lifeBarX
+						- (((float) (lifeBgBmp.getWidth() - lifeBmp.getWidth()) / 2)),
+				topSpikedBarHeight
+						+ lifeBmp.getHeight()
+						+ (((float) (lifeBgBmp.getHeight() - lifeBmp
+								.getHeight()) / 2)));
 		Rect rectLife;
-		if(life==0 || player.getY() > height){
+		if (life == 0 || player.getY() > height) {
 			rectLife = new Rect(0, 0, 0, 0);
-		}else if(life==30){
-			rectLife = new Rect(lifeBmp.getWidth()*2/3, 0, lifeBmp.getWidth(), lifeBmp.getHeight());
-		}else if(life==60){
-			rectLife = new Rect(lifeBmp.getWidth()/3, 0, lifeBmp.getWidth(), lifeBmp.getHeight());
-		}else {
+		} else if (life == 30) {
+			rectLife = new Rect(lifeBmp.getWidth() * 2 / 3, 0,
+					lifeBmp.getWidth(), lifeBmp.getHeight());
+		} else if (life == 60) {
+			rectLife = new Rect(lifeBmp.getWidth() / 3, 0, lifeBmp.getWidth(),
+					lifeBmp.getHeight());
+		} else {
 			rectLife = new Rect(0, 0, lifeBmp.getWidth(), lifeBmp.getHeight());
 		}
-		
+
 		canvas.drawBitmap(lifeBmp, rectLife, rect4, null);
 	}
 
 	@Override
 	protected void process() {
-		// TODO Auto-generated method stub
 		super.process();
 
 		background.update();
-
 		for (Floor floor : floors) {
-//			floor.move(0, 5);
-//			floor.process();
 			floor.frameTrig();
 		}
 
 		for (ArrayList<Floor> floors : footboards) {
 			for (Floor floor : floors) {
 				floor.move(0, 3);
-//				floor.process();
 				floor.frameTrig();
-				if(floor.eatHumanTree!=null){
+				if (floor.eatHumanTree != null) {
 					floor.eatHumanTree.move(0, 3);
-//					floor.eatHumanTree.process();
 					floor.frameTrig();
 				}
 			}
@@ -482,24 +429,9 @@ public class MyGameModel extends GameModel {
 			drawCount = 0;
 		}
 
-//		player.move(0, 5);
 		player.frameTrig();
-//		player.process();
-		
-		
 	}
 
-//	@Override
-//	public void onTouchEvent(MotionEvent event) {
-//		// TODO Auto-generated method stub
-//		super.onTouchEvent(event);
-//
-//		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-//			// player.setAction("");
-//			player.onTouch();
-//		}
-//	}
-	
 	@Override
 	public synchronized void onTouchEvent(MotionEvent event) {
 		float _x = event.getX();
@@ -517,17 +449,20 @@ public class MyGameModel extends GameModel {
 				isPressLeftMoveBtn = true;
 				move = LEFT;
 				player.updateBitmap(LEFT);
-			}
-			else if (_x > this.getWidth() - Controler.bmpWidth
+			} else if (_x > this.getWidth() - Controler.bmpWidth
 					&& _x < this.getWidth()
 					&& _y > this.getHeight() - Controler.bmpHeight
 					&& _y < this.getHeight()) {
 				isPressRightMoveBtn = true;
 				move = RIGHT;
 				player.updateBitmap(RIGHT);
-			}
-			else{
-				player.onTouch();
+			} else {
+				if (_x > this.getWidth() / 2) {
+					player.jumpToRight();
+				} else {
+					player.jumpToLeft();
+				}
+
 			}
 		}
 		if ((event.getAction() == event.ACTION_UP)
@@ -557,7 +492,7 @@ public class MyGameModel extends GameModel {
 				player.updateBitmap(LEFT);
 			}
 		}
-//		return true;
+		// return true;
 	}
 
 	public static boolean gameFlag = true;
@@ -567,7 +502,6 @@ public class MyGameModel extends GameModel {
 		new Thread(new Runnable() {
 			public void run() {
 				Random r = new Random();
-
 				// int i = r.nextInt(3); //隨機出現三種座標之一
 				int i = 0;
 				// long delayTime =0;
@@ -591,12 +525,11 @@ public class MyGameModel extends GameModel {
 						// e.printStackTrace();
 						// }
 
-						// delayTime = System.currentTimeMillis();
-
 						if (!gameFlag) {
 							break;
 						}
-						int readyForCreateFootboardParentNumber = currentXs.size();
+						int readyForCreateFootboardParentNumber = currentXs
+								.size();
 						int randomCreateNumber = r
 								.nextInt(readyForCreateFootboardParentNumber + 1);
 						randomCreateNumber++;
@@ -614,7 +547,8 @@ public class MyGameModel extends GameModel {
 
 						des *= DISTANCE_MULTIPLE;
 						int temp = 0;
-						int x = r.nextInt(readyForCreateFootboardParentNumber + 1);
+						int x = r
+								.nextInt(readyForCreateFootboardParentNumber + 1);
 						x++;
 						if (x > 2)
 							x = 2;
@@ -628,8 +562,6 @@ public class MyGameModel extends GameModel {
 						} else if (x == 1 && currentXs.size() == 2) {
 							x = 1;
 						}
-
-						// boolean left=false, right=;
 
 						int addX = 0;
 						for (int number = 0; number < readyForCreateFootboardParentNumber; number++) {
@@ -649,17 +581,11 @@ public class MyGameModel extends GameModel {
 								x--;
 							}
 
-							// }else if(randomCreateNumber==1){
-							//
-							// }else {
-							//
-							// }
 							for (int k = 0; k < x; k++) {
-
-								if(addX+footboardWidth*2>width){
+								if (addX + footboardWidth * 2 > width) {
 									continue;
 								}
-								
+
 								if (currentX == width - footboardWidth) {
 									// x=1;
 									if (des < DISTANCE_MULTIPLE * 10) {
@@ -694,19 +620,21 @@ public class MyGameModel extends GameModel {
 									temp = Math.abs(temp);
 								}
 
-								if(k>0 && addX+footboardWidth > currentX+temp){
+								if (k > 0
+										&& addX + footboardWidth > currentX
+												+ temp) {
 									continue;
 								}
-								
+
 								addX = 0;
 								if (i == 0) { // 第一種座標
-								// 111 currentX += temp;
+									// 111 currentX += temp;
 									addX = currentX + temp;
 									if (addX < 0) {
 										addX = 0;
 									} else if (addX > width - footboardWidth) {
 										addX = width - footboardWidth;
-									} 
+									}
 									// 產生地板的Y座標為螢幕下面邊緣，此方法會產生和人物交錯的現象。
 									// footboard = new Footboard(getContext(),
 									// addX,
@@ -720,11 +648,11 @@ public class MyGameModel extends GameModel {
 
 									footboard = new Floor(addX, 10, false);
 									footboard.setPosition(addX, 500);
-//									footboard.setBitmapAndAutoChangeWH(BitmapUtil.floor);
+									// footboard.setBitmapAndAutoChangeWH(BitmapUtil.floor);
 									footboard.setBitmap(BitmapUtil.floor);
 									footboard.setWidth(footboardWidth);
 									footboard.setHeight(footboardHeight);
-									
+
 									footboardsTheSameLine.add(footboard);
 
 								}
@@ -749,22 +677,19 @@ public class MyGameModel extends GameModel {
 						currentXs = tempCurrentXs;
 						footboards.add(footboardsTheSameLine);
 
-						 FireBall fireBall = new FireBall(width);
-						 fireballs.add(fireBall);
-
-						// delayTime = System.currentTimeMillis() - delayTime;
+						FireBall fireBall = new FireBall(width);
+						fireballs.add(fireBall);
 					}
 				}
 			}
 		}).start();
 	}
-	
-	public int getWidth(){
-		
+
+	public int getWidth() {
 		return this.width;
 	}
-	
-	public int getHeight(){
+
+	public int getHeight() {
 		return this.height;
 	}
 }

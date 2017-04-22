@@ -3,7 +3,7 @@ package com.example.try_upstage.sprites;
 import com.example.try_gameengine.action.MovementAction;
 import com.example.try_gameengine.action.MovementActionInfo;
 import com.example.try_gameengine.action.MovementActionItemBaseReugularFPS;
-import com.example.try_gameengine.action.MovementActionSet;
+import com.example.try_gameengine.action.MovementActionSetWithThread;
 import com.example.try_gameengine.action.listener.IActionListener;
 import com.example.try_gameengine.framework.Sprite;
 import com.example.try_upstage.sprites.Player.Rabbit_action;
@@ -13,12 +13,10 @@ public class Tool extends Sprite{
 	
 	public Tool(float x, float y, boolean autoAdd) {
 		super(x, y, autoAdd);
-		// TODO Au to-generated constructor stub
-		
 	}
 	
 	private void initMovement(){
-		floorDownMovementAction = new MovementActionSet();
+		floorDownMovementAction = new MovementActionSetWithThread();
 		MovementActionInfo info = new MovementActionInfo(5000, 200, 2, 10, "", this, Rabbit_action.RJump.getName());
 		floorDownMovementAction.addMovementAction(new MovementActionItemBaseReugularFPS(info));
 		floorDownMovementAction.setActionListener(new IActionListener() {
@@ -67,9 +65,6 @@ public class Tool extends Sprite{
 		floorDownMovementAction.start();
 		
 		setMovementAction(floorDownMovementAction);
-		
-		
-		
 	}
 	
 }

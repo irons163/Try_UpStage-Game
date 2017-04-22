@@ -6,9 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 public class ToolUtil {
-	
-	
-	
 	public float tool_x;
 	public float tool_y;
 	public int tool_width;
@@ -25,7 +22,6 @@ public class ToolUtil {
 				
 				@Override
 				public void run() {
-					// TODO Auto-generated method stub
 					try {
 						Thread.sleep(300);
 					} catch (InterruptedException e) {

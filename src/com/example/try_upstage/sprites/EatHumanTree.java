@@ -8,6 +8,7 @@ import com.example.try_gameengine.action.MovementAction;
 import com.example.try_gameengine.action.MovementActionInfo;
 import com.example.try_gameengine.action.MovementActionItemBaseReugularFPS;
 import com.example.try_gameengine.action.MovementActionSet;
+import com.example.try_gameengine.action.MovementActionSetWithThread;
 import com.example.try_gameengine.action.MovementAtionController;
 import com.example.try_gameengine.action.listener.IActionListener;
 import com.example.try_gameengine.framework.Sprite;
@@ -98,7 +99,7 @@ public class EatHumanTree extends Sprite{
 	}
 	
 	private void initMovement(){
-		jumpMovement = new MovementActionSet();
+		jumpMovement = new MovementActionSetWithThread();
 		jumpMovement.setMovementActionController(new MovementAtionController());
 		MovementActionInfo info = new MovementActionInfo(50, 5, 2, -160, "", this, EatHumanTree_Action.Eat.getName());
 		jumpMovement.addMovementAction(new MovementActionItemBaseReugularFPS(info));
