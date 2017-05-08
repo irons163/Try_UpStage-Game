@@ -11,6 +11,7 @@ import com.example.try_gameengine.action.GravityController;
 import com.example.try_gameengine.action.MovementAction;
 import com.example.try_gameengine.action.MovementActionItemMoveByGravity;
 import com.example.try_gameengine.action.MovementAtionController;
+import com.example.try_gameengine.action.info.MovementActionMoveByGravityInfo;
 import com.example.try_gameengine.framework.Sprite;
 import com.example.try_upstage.MainActivity;
 import com.example.try_upstage.MyGameModel;
@@ -93,7 +94,8 @@ public class Player extends Sprite {
 	private void initMovement() {
 		GravityController gravityController = new GravityController(new PointF(50, -450));
 		gravityController.setAy(300);
-		jumpMovement = new MovementActionItemMoveByGravity(8000, gravityController);
+		MovementActionMoveByGravityInfo gravityInfo = new MovementActionMoveByGravityInfo(8000, gravityController);
+		jumpMovement = new MovementActionItemMoveByGravity(gravityInfo);
 		jumpMovement.setMovementActionController(new MovementAtionController());
 		jumpMovement.getInfo().setSprite(this);
 		jumpMovement.getInfo().setSpriteActionName(Rabbit_action.RJump.getName());
@@ -111,7 +113,8 @@ public class Player extends Sprite {
 		
 		gravityController = new GravityController(new PointF(-50, -450));
 		gravityController.setAy(300);
-		jumpLMovement = new MovementActionItemMoveByGravity(8000, gravityController);
+		gravityInfo = new MovementActionMoveByGravityInfo(8000, gravityController);
+		jumpLMovement = new MovementActionItemMoveByGravity(gravityInfo);
 		jumpLMovement.setMovementActionController(new MovementAtionController());
 		jumpLMovement.getInfo().setSprite(this);
 		jumpLMovement.getInfo().setSpriteActionName(Rabbit_action.RJump.getName());
