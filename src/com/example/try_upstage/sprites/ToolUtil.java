@@ -48,6 +48,11 @@ public class ToolUtil {
 		this.type = type;
 	}
 	
+	public void setPosition(float footboard_x, float footboard_y){
+		this.tool_x = footboard_x+30;
+		this.tool_y = footboard_y-tool_width;
+	}
+	
 	public void draw(Canvas canvas, float dy) {
 		this.tool_y -= dy; 
 		canvas.drawBitmap(bitmap, tool_x, tool_y, null);

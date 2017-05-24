@@ -57,7 +57,7 @@ public class EatHumanTree extends Sprite{
 		setPosition(x, y);
 		
 		addActionFPS(EatHumanTree_Action.Eat.getName(),
-				Rabbit_action.LJump.getBitmaps(), new int[] { 20, 20, 20 },
+				EatHumanTree_Action.Eat.getBitmaps(), new int[] { 20, 20, 20 },
 				true, new com.example.try_gameengine.framework.IActionListener() {
 					
 					@Override

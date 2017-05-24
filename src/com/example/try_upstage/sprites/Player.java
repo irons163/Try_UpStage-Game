@@ -4,8 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.provider.ContactsContract.CommonDataKinds.Event;
-import android.view.MotionEvent;
+import android.graphics.RectF;
 
 import com.example.try_gameengine.action.GravityController;
 import com.example.try_gameengine.action.MovementAction;
@@ -19,12 +18,20 @@ import com.example.try_upstage.R;
 import com.example.try_upstage.utils.BitmapUtil;
 
 public class Player extends Sprite {
-	MovementAction jumpMovement, jumpLMovement;
+	MovementAction jumpMovement, jumpLMovement, downMovement;
 	int walkCount = 0;
 	boolean isInjure = false;
 	Bitmap bitmap, walkBitmap01, walkBitmap02, walkBitmap03, downbitmap,
 			injureBmp;
 	Thread injureThread;
+	public Dir dir = Dir.NONE;
+	private float moveX, moveY;
+	
+	public enum Dir{
+		NONE,
+		UP,
+		DOWN
+	}
 
 	enum Rabbit_action {
 
@@ -81,6 +88,8 @@ public class Player extends Sprite {
 
 	public Player(float x, float y, boolean autoAdd) {
 		super(x, y, autoAdd);
+		
+		this.setCollisionRectF(new RectF(getLeft(), getTop(), getLeft() + getWidth(), getTop() + getHeight()));
 		addActionFPS(Rabbit_action.LJump.getName(),
 				Rabbit_action.LJump.getBitmaps(), new int[] { 20, 20, 20 },
 				true);
@@ -105,7 +114,18 @@ public class Player extends Sprite {
 			@Override
 			public void onTick(float dx, float dy) {
 				// TODO Auto-generated method stub
-				move(dx, dy);
+//				move(dx, dy);
+//				moveX = dx;
+				move(dx, 0);
+				moveY = dy;
+				
+				if(dy > 0){
+					dir = Dir.DOWN;
+				}else if(dy < 0){
+					dir = Dir.UP;
+				}else{
+					dir = Dir.NONE;
+				}
 			}
 		});
 		
@@ -124,11 +144,47 @@ public class Player extends Sprite {
 			@Override
 			public void onTick(float dx, float dy) {
 				// TODO Auto-generated method stub
-				move(dx, dy);
+//				move(dx, dy);
+//				moveX = dx;
+				move(dx, 0);
+				moveY = dy;
+				
+				if(dy > 0){
+					dir = Dir.DOWN;
+				}else if(dy < 0){
+					dir = Dir.UP;
+				}else{
+					dir = Dir.NONE;
+				}
 			}
 		});
 		
 		jumpLMovement.initMovementAction();
+		
+		
+		gravityController = new GravityController(new PointF(0, 0));
+		gravityController.setAy(100);
+		gravityInfo = new MovementActionMoveByGravityInfo(8000, gravityController);
+		downMovement = new MovementActionItemMoveByGravity(gravityInfo);
+		downMovement.setMovementActionController(new MovementAtionController());
+		downMovement.getInfo().setSprite(this);
+		downMovement.getInfo().setSpriteActionName(Rabbit_action.RJump.getName());
+		
+		downMovement.setTimerOnTickListener(new MovementAction.TimerOnTickListener() {
+			
+			@Override
+			public void onTick(float dx, float dy) {
+				// TODO Auto-generated method stub
+//				move(dx, dy);
+//				moveX = dx;
+				move(dx, 0);
+				moveY = dy;
+				
+				dir = Dir.NONE;
+			}
+		});
+		
+		downMovement.initMovementAction();
 	}
 
 	public void jumpToRight() {
@@ -141,6 +197,11 @@ public class Player extends Sprite {
 		jumpLMovement.controller.restart();
 		setMovementAction(jumpLMovement);
 	}
+	
+	public void down(){
+		downMovement.controller.restart();
+		setMovementAction(downMovement);
+	}
 
 	@Override
 	public void drawSelf(Canvas canvas, Paint paint) {
@@ -149,6 +210,8 @@ public class Player extends Sprite {
 
 	public void draw(Canvas canvas, float dy, float dx) {
 		float y = getY();
+		dy -= moveY;
+//		dx -= moveX;
 		y -= dy;
 		setY(y);
 		float x = getX();
@@ -163,7 +226,7 @@ public class Player extends Sprite {
 			return;
 		}
 
-		if (dx == 0 && dy >= 0) {
+		if ((dx == 0 || dx == MyGameModel.MOVESPEED) && dy >= 0) {
 			bitmap = walkBitmap02;
 			// canvas.drawBitmap(bitmap, x, y, null);
 			setBitmapAndAutoChangeWH(bitmap);
@@ -174,6 +237,10 @@ public class Player extends Sprite {
 			setBitmapAndAutoChangeWH(downbitmap);
 			drawSelf(canvas, null);
 			walkCount = 0;
+//			bitmap = walkBitmap02;
+//			setBitmapAndAutoChangeWH(bitmap);
+//			drawSelf(canvas, null);
+//			walkCount = 0;
 		} else if (MyGameModel.SLIDERSPEED == Math.abs(dx)) {
 			bitmap = walkBitmap02;
 			// canvas.drawBitmap(bitmap, x, y, null);
@@ -181,10 +248,11 @@ public class Player extends Sprite {
 			drawSelf(canvas, null);
 			walkCount = 0;
 		} else {
-			if (walkCount % 2 == 0) {
+			if (walkCount % 30 == 0) {
 				bitmap = walkBitmap02;
-			} else if (walkCount % 3 == 0) {
+			} else if (walkCount % 60 == 0) {
 				bitmap = walkBitmap01;
+				walkCount = 0;
 			} else {
 				bitmap = walkBitmap03;
 			}

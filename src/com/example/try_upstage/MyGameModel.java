@@ -17,12 +17,14 @@ import android.view.MotionEvent;
 
 import com.example.try_gameengine.framework.Data;
 import com.example.try_gameengine.framework.GameModel;
+import com.example.try_gameengine.framework.TouchDispatcher;
 import com.example.try_upstage.model.Background;
 import com.example.try_upstage.sprites.Controler;
 import com.example.try_upstage.sprites.EatHumanTree;
 import com.example.try_upstage.sprites.FireBall;
 import com.example.try_upstage.sprites.Floor;
 import com.example.try_upstage.sprites.Player;
+import com.example.try_upstage.sprites.Player.Dir;
 import com.example.try_upstage.sprites.ToolUtil;
 import com.example.try_upstage.utils.BitmapUtil;
 import com.example.try_upstage.utils.Common;
@@ -40,7 +42,7 @@ public class MyGameModel extends GameModel {
 	private final Object CREATE_FOOTBAR_LOCK = new Object();
 	int height, width; // 螢幕高寬
 	Floor footboard;
-	private final float BASE_SPEED = (float) Common.screenWidth / 1200;
+	private final float BASE_SPEED = (float) Common.screenWidth / 300f;
 	float SPEED = BASE_SPEED;
 	int drawCount;
 	Player player;
@@ -56,11 +58,13 @@ public class MyGameModel extends GameModel {
 	public static final int RIGHT = 2;
 	int whichFoorbar = 0;
 	int life = 90;
-	public final float DOWNSPEED = BASE_SPEED;
+	public final float DOWNSPEED = BASE_SPEED * 3.3f;
 	Paint paint = new Paint();
 	ArrayList<FireBall> fireballs = new ArrayList<FireBall>();
 	boolean isPressLeftMoveBtn, isPressRightMoveBtn;
 	Controler controler;
+	boolean isInjure = false;
+	boolean isDrawPlayer = true;
 
 	public MyGameModel(Context context, Data data) {
 		super(context, data);
@@ -107,115 +111,29 @@ public class MyGameModel extends GameModel {
 	protected void doDraw(Canvas canvas) {
 		super.doDraw(canvas);
 
-		boolean isInjure = false;
-		boolean isDrawPlayer = true;
+
 		background.draw(canvas);
 		controler.paint(canvas);
 
-		float footboardByPlayerX, footboardByPlayerY = 0;
-		int re = 0;
 
-		playerStandOnFootboard = false;
+		if(isInjure){
+			life -= 30;
+			if (life < 0) {
+				life = 0;
+			}
+			paint.setColor(Color.RED);
+			paint.setAlpha(100);
+			Rect rect6 = new Rect(0, 0, width, height);
+			canvas.drawRect(rect6, paint);
+		}
+
 		for (int j = 0; j < footboards.size(); j++) {
 			ArrayList<Floor> f = footboards.get(j);
 			for (int k = 0; k < f.size(); k++) {
-				boolean remove = false;
 				Floor ene = f.get(k);
-
-				ToolUtil toolUtil = null;
-				EatHumanTree eatHumanTree = null;
-				if (ene.toolNum == Floor.NOTOOL) {
-					toolUtil = null;
-				} else if (ene.toolNum == Floor.BOMB) {
-					toolUtil = new ToolUtil(ene.getX(), ene.getY(), Floor.BOMB);
-					// toolUtil.draw(canvas, SPEED);
-				} else if (ene.toolNum == Floor.BOMB_EXPLODE) {
-
-				} else if (ene.toolNum == Floor.EAT_HUMAN_TREE) {
-					eatHumanTree = ene.eatHumanTree;
-				} else {
-					toolUtil = new ToolUtil(ene.getX(), ene.getY(), Floor.CURE);
-					// toolUtil.draw(canvas, SPEED);
-				}
-
-				if ((ene.getX() < player.getX() + player.getWidth()
-						- SMOOTH_DEVIATION * 4)
-						&& (ene.getX() + footboardWidth > player.getX()
-								+ SMOOTH_DEVIATION * 4)
-						&& (ene.getY() >= player.getY() + player.getHeight()
-								- 1 && ene.getY() < player.getY()
-								+ player.getHeight() + DOWNSPEED + SPEED)) {
-
-					if (toolUtil != null
-							&& (toolUtil.tool_x < player.getX()
-									+ player.getWidth() - SMOOTH_DEVIATION * 4)
-							&& (toolUtil.tool_x + toolUtil.tool_width > player
-									.getX() + SMOOTH_DEVIATION * 4)
-							&& ene.toolNum != Floor.BOMB_EXPLODE) {
-						if (ene.toolNum == Floor.BOMB) {
-							isInjure = true;
-							ene.toolNum = Floor.BOMB_EXPLODE;
-							toolExplodingUtil = new ToolUtil(ene.getX(),
-									ene.getY(), Floor.BOMB_EXPLODE);
-							life -= 60;
-							if (life < 0) {
-								life = 0;
-							}
-						} else if (ene.toolNum == Floor.CURE) {
-							life = 90;
-							ene.toolNum = Floor.NOTOOL;
-						}
-
-					}
-
-					if (eatHumanTree != null
-							&& (eatHumanTree.getX() < player.getX()
-									+ player.getWidth() - SMOOTH_DEVIATION * 4)
-							&& (eatHumanTree.getX() + eatHumanTree.getWidth() > player
-									.getX() + SMOOTH_DEVIATION * 4)) {
-						if (eatHumanTree.eatStartAndDetectHurtPlayer()) {
-							isInjure = true;
-							life -= 30;
-							if (life < 0) {
-								life = 0;
-							}
-							paint.setColor(Color.RED);
-							paint.setAlpha(100);
-							Rect rect6 = new Rect(0, 0, width, height);
-							canvas.drawRect(rect6, paint);
-						}
-					}
-
-					if (playerDownOnFootBoard) {
-						whichFoorbar = 0;
-						playerMoveSpeed = 0;
-						if (ene.which == 5) {
-							isInjure = true;
-							life -= 30;
-							if (life < 0) {
-								life = 0;
-							}
-							paint.setColor(Color.RED);
-							paint.setAlpha(100);
-							Rect rect6 = new Rect(0, 0, width, height);
-							canvas.drawRect(rect6, paint);
-						}
-						if (ene.which == 1) {
-							whichFoorbar = 1;
-							playerMoveSpeed = SLIDERSPEED;
-						} else if (ene.which == 2) {
-							whichFoorbar = 2;
-							playerMoveSpeed = -SLIDERSPEED;
-						}
-					}
-
-					playerStandOnFootboard = true;
-					footboardByPlayerY = ene.getY();
-					player.setY(footboardByPlayerY - player.getHeight());
-					ene.setCount();
-					playerDownOnFootBoard = false;
-				}
-
+				ToolUtil toolUtil = ene.toolUtil;
+				EatHumanTree eatHumanTree = ene.eatHumanTree;
+				
 				if (ene.toolNum == Floor.BOMB_EXPLODE
 						&& toolExplodingUtil != null) {
 					if (toolExplodingUtil.isExploding) {
@@ -232,7 +150,7 @@ public class MyGameModel extends GameModel {
 				}
 
 				if (toolUtil != null) {
-					toolUtil.draw(canvas, SPEED);
+					toolUtil.draw(canvas, -SPEED);
 				}
 
 				if (eatHumanTree != null) {
@@ -242,17 +160,11 @@ public class MyGameModel extends GameModel {
 
 				if (ene.getY() > 0 - SPEED && ene.drawBitmap != null) {
 					ene.draw(canvas, SPEED);
-				} else {
-					remove = true;
-					re = k;
-				}
-
-				if (remove) {
-					f.remove(re);
-					k--;
+					ene.drawSelf(canvas, paint); 
 				}
 			}
 		}
+
 
 		Bitmap bitmap = BitmapUtil.top_spiked_bar;
 		float topSpikedBarHeight = (float) bitmap.getHeight()
@@ -271,41 +183,41 @@ public class MyGameModel extends GameModel {
 			if (playerStandOnFootboard) {
 				if (move == LEFT) {
 					if (player.getX() <= 0) {
-						playerDy = SPEED;
+						playerDy = -SPEED;
 						playerDx = 0;
 						// player.draw(canvas, SPEED, 0, isInjure);
 						move = 0;
 					} else {
-						playerDy = SPEED;
+						playerDy = -SPEED;
 						playerDx = MOVESPEED + playerMoveSpeed;
 						// player.draw(canvas, SPEED, MOVESPEED +
 						// playerMoveSpeed, isInjure);
 					}
 				} else if (move == RIGHT) {
 					if (player.getX() + player.getWidth() >= width) {
-						playerDy = SPEED;
+						playerDy = -SPEED;
 						playerDx = 0;
 						// player.draw(canvas, SPEED, 0, isInjure);
 						move = 0;
 					} else {
-						playerDy = SPEED;
+						playerDy = -SPEED;
 						playerDx = -MOVESPEED + playerMoveSpeed;
 						// player.draw(canvas, SPEED, -MOVESPEED +
 						// playerMoveSpeed, isInjure);
 					}
 				} else {
 					if (whichFoorbar == 1) {
-						playerDy = SPEED;
+						playerDy = -SPEED;
 						playerDx = playerMoveSpeed;
 						// player.draw(canvas, SPEED, playerMoveSpeed,
 						// isInjure);
 					} else if (whichFoorbar == 2) {
-						playerDy = SPEED;
+						playerDy = -SPEED;
 						playerDx = playerMoveSpeed;
 						// player.draw(canvas, SPEED, playerMoveSpeed,
 						// isInjure);
 					} else {
-						playerDy = SPEED;
+						playerDy = -SPEED;
 						playerDx = 0;
 						// player.draw(canvas, SPEED, 0, isInjure);
 					}
@@ -339,6 +251,11 @@ public class MyGameModel extends GameModel {
 					// player.draw(canvas, -DOWNSPEED, 0, isInjure);
 				}
 				playerDownOnFootBoard = true;
+				Log.e("playerDownOnFootBoard", "true");
+				
+//				if(player.dir == Dir.DOWN){
+//					playerDy = 0;
+//				}
 			}
 		}
 
@@ -361,7 +278,11 @@ public class MyGameModel extends GameModel {
 		}
 
 		if (isDrawPlayer) {
+			isDrawPlayer = false;
 			player.draw(canvas, playerDy, playerDx, isInjure);
+			Log.e("player", "down");
+		}else{
+			Log.e("player", "no down");
 		}
 		int lifeBarX = 0;
 		Bitmap lifeBgBmp = BitmapUtil.life_bg;
@@ -404,7 +325,128 @@ public class MyGameModel extends GameModel {
 	@Override
 	protected void process() {
 		super.process();
+		
+		TouchDispatcher.getInstance().dispatch();
 
+		isInjure = false;
+		isDrawPlayer = true;
+		float footboardByPlayerX, footboardByPlayerY = 0;
+		int re = 0;
+		playerStandOnFootboard = false;
+		for (int j = 0; j < footboards.size(); j++) {
+			ArrayList<Floor> f = footboards.get(j);
+			for (int k = 0; k < f.size(); k++) {
+				boolean remove = false;
+				Floor ene = f.get(k);
+
+				ToolUtil toolUtil = null;
+				EatHumanTree eatHumanTree = null;
+				if (ene.toolNum == Floor.NOTOOL) {
+					toolUtil = ene.toolUtil = null;
+				} else if (ene.toolNum == Floor.BOMB) {
+					toolUtil = ene.toolUtil;
+					// toolUtil.draw(canvas, SPEED);
+				} else if (ene.toolNum == Floor.BOMB_EXPLODE) {
+					toolUtil = ene.toolUtil = null;
+				} else if (ene.toolNum == Floor.EAT_HUMAN_TREE) {
+					eatHumanTree = ene.eatHumanTree;
+				} else {
+					toolUtil = ene.toolUtil;
+					// toolUtil.draw(canvas, SPEED);
+				}
+				
+				if(RectF.intersects(player.getFrameInScene(), ene.getFrameInScene()) && player.dir != Dir.UP){
+
+//				if ((ene.getX() < player.getX() + player.getWidth()
+//						- SMOOTH_DEVIATION * 4)
+//						&& (ene.getX() + footboardWidth > player.getX()
+//								+ SMOOTH_DEVIATION * 4)
+//						&& (ene.getY() >= player.getY() + player.getHeight()
+//								- 1 && ene.getY() < player.getY()
+//								+ player.getHeight() - DOWNSPEED - SPEED)) {
+
+					if (toolUtil != null
+							&& (toolUtil.tool_x < player.getX()
+									+ player.getWidth() - SMOOTH_DEVIATION * 4)
+							&& (toolUtil.tool_x + toolUtil.tool_width > player
+									.getX() + SMOOTH_DEVIATION * 4)
+							&& ene.toolNum != Floor.BOMB_EXPLODE) {
+						if (ene.toolNum == Floor.BOMB) {
+							isInjure = true;
+							ene.toolNum = Floor.BOMB_EXPLODE;
+							toolExplodingUtil = new ToolUtil(ene.getX(),
+									ene.getY(), Floor.BOMB_EXPLODE);
+							life -= 60;
+							if (life < 0) {
+								life = 0;
+							}
+						} else if (ene.toolNum == Floor.CURE) {
+							life = 90;
+							ene.toolNum = Floor.NOTOOL;
+						}
+					}
+
+					if (eatHumanTree != null
+							&& (eatHumanTree.getX() < player.getX()
+									+ player.getWidth() - SMOOTH_DEVIATION * 4)
+							&& (eatHumanTree.getX() + eatHumanTree.getWidth() > player
+									.getX() + SMOOTH_DEVIATION * 4)) {
+						if (eatHumanTree.eatStartAndDetectHurtPlayer()) {
+							isInjure = true;
+						}
+					}
+
+					if (playerDownOnFootBoard) {
+						whichFoorbar = 0;
+						playerMoveSpeed = 0;
+						if (ene.which == 5) {
+							isInjure = true;
+						}
+						if (ene.which == 1) {
+							whichFoorbar = 1;
+							playerMoveSpeed = SLIDERSPEED;
+						} else if (ene.which == 2) {
+							whichFoorbar = 2;
+							playerMoveSpeed = -SLIDERSPEED;
+						}
+						
+						player.removeAllMovementActions();
+						player.dir = Dir.NONE;
+						
+						Log.e("RE", "removeAllMovementActions" + player.dir);
+					}
+
+					playerStandOnFootboard = true;
+					footboardByPlayerY = ene.getY();
+					player.setY(footboardByPlayerY - player.getHeight() +1);
+					ene.setCount();
+					playerDownOnFootBoard = false;
+					
+
+				}
+				
+//				Log.e("RE2", "No collistion" + player.dir);
+
+
+				if (ene.getY() > 0 - SPEED && ene.drawBitmap != null) {
+//					ene.draw(canvas, SPEED);
+//					ene.drawSelf(canvas, paint);
+				} else {
+					remove = true;
+					re = k;
+				}
+
+				if (remove) {
+					f.remove(re);
+					k--;
+				}
+			}
+		}
+		
+		if(!playerStandOnFootboard)
+			Log.e("playerStandOnFootboard", "false" 
+					 + player.dir);
+			
 		background.update();
 		for (Floor floor : floors) {
 			floor.frameTrig();
@@ -412,14 +454,17 @@ public class MyGameModel extends GameModel {
 
 		for (ArrayList<Floor> floors : footboards) {
 			for (Floor floor : floors) {
-				floor.move(0, 3);
+				floor.move(0, SPEED);
 				floor.frameTrig();
 				if (floor.eatHumanTree != null) {
-					floor.eatHumanTree.move(0, 3);
-					floor.frameTrig();
+//					floor.eatHumanTree.move(0, SPEED);
+					floor.eatHumanTree.frameTrig();
 				}
 			}
 		}
+		
+//		if(playerDownOnFootBoard)
+//			player.move(0, SPEED);
 
 		drawCount++;
 		if (drawCount % ((int) ((float) 60 / SPEED * BASE_SPEED)) == 0) {
@@ -433,7 +478,7 @@ public class MyGameModel extends GameModel {
 	}
 
 	@Override
-	public synchronized void onTouchEvent(MotionEvent event) {
+	public synchronized void onTouchEvent(MotionEvent event) {		
 		float _x = event.getX();
 		float _y = event.getY();
 		if (((event.getAction() & event.ACTION_MASK) == event.ACTION_POINTER_DOWN)

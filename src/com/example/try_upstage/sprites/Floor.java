@@ -30,6 +30,7 @@ public class Floor extends Sprite{
 	Bitmap bitmap2;
 	Bitmap bitmap3;
 	
+	public ToolUtil toolUtil;
 	public EatHumanTree eatHumanTree;
 	
 	public Floor(float x, float y, boolean autoAdd) {
@@ -62,8 +63,10 @@ public class Floor extends Sprite{
 		 int random = r.nextInt(6);
 			 if(random==1){
 				 toolNum=random;
+				 toolUtil = new ToolUtil(getX(), getY(), Floor.BOMB);
 			 }else if(random==2){
 				 toolNum=random;
+				 toolUtil = new ToolUtil(getX(), getY(), Floor.CURE);
 			 }else if(random==4){
 				 toolNum=random;
 				 eatHumanTree = new EatHumanTree(getX(), getY(), false);
@@ -80,6 +83,9 @@ public class Floor extends Sprite{
 		// TODO Auto-generated method stub
 		super.setPosition(x, y);
 		
+		if(toolUtil!=null){
+			toolUtil.setPosition(x, y);
+		}
 		if(eatHumanTree!=null){
 			eatHumanTree.setPosition(x, y);
 		}
@@ -193,7 +199,7 @@ public class Floor extends Sprite{
 		
 		if(drawBitmap!=null) {
 			setBitmap(drawBitmap);
-			canvas.drawBitmap(getBitmap(), null, rect1, null);
+//			canvas.drawBitmap(getBitmap(), null, rect1, null);
 		}
 	}
 }
