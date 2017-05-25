@@ -148,7 +148,7 @@ public class Floor extends Sprite{
 		animStep++;}
 	}
 	
-	public void draw(Canvas canvas, float dy) {
+	public void moveByY(float dy) {
 		move(0, -dy);
 		RectF rect1 = new RectF(getX(),getY(),getX()+getWidth(),getY()+getHeight());
 		

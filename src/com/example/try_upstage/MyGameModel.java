@@ -159,7 +159,7 @@ public class MyGameModel extends GameModel {
 				}
 
 				if (ene.getY() > 0 - SPEED && ene.drawBitmap != null) {
-					ene.draw(canvas, SPEED);
+//					ene.draw(canvas, SPEED);
 					ene.drawSelf(canvas, paint); 
 				}
 			}
@@ -345,26 +345,15 @@ public class MyGameModel extends GameModel {
 					toolUtil = ene.toolUtil = null;
 				} else if (ene.toolNum == Floor.BOMB) {
 					toolUtil = ene.toolUtil;
-					// toolUtil.draw(canvas, SPEED);
 				} else if (ene.toolNum == Floor.BOMB_EXPLODE) {
 					toolUtil = ene.toolUtil = null;
 				} else if (ene.toolNum == Floor.EAT_HUMAN_TREE) {
 					eatHumanTree = ene.eatHumanTree;
 				} else {
 					toolUtil = ene.toolUtil;
-					// toolUtil.draw(canvas, SPEED);
 				}
 				
 				if(RectF.intersects(player.getFrameInScene(), ene.getFrameInScene()) && player.dir != Dir.UP){
-
-//				if ((ene.getX() < player.getX() + player.getWidth()
-//						- SMOOTH_DEVIATION * 4)
-//						&& (ene.getX() + footboardWidth > player.getX()
-//								+ SMOOTH_DEVIATION * 4)
-//						&& (ene.getY() >= player.getY() + player.getHeight()
-//								- 1 && ene.getY() < player.getY()
-//								+ player.getHeight() - DOWNSPEED - SPEED)) {
-
 					if (toolUtil != null
 							&& (toolUtil.tool_x < player.getX()
 									+ player.getWidth() - SMOOTH_DEVIATION * 4)
@@ -424,13 +413,9 @@ public class MyGameModel extends GameModel {
 					
 
 				}
-				
-//				Log.e("RE2", "No collistion" + player.dir);
-
 
 				if (ene.getY() > 0 - SPEED && ene.drawBitmap != null) {
-//					ene.draw(canvas, SPEED);
-//					ene.drawSelf(canvas, paint);
+
 				} else {
 					remove = true;
 					re = k;
@@ -454,7 +439,8 @@ public class MyGameModel extends GameModel {
 
 		for (ArrayList<Floor> floors : footboards) {
 			for (Floor floor : floors) {
-				floor.move(0, SPEED);
+//				floor.move(0, SPEED);
+				floor.moveByY(-SPEED);
 				floor.frameTrig();
 				if (floor.eatHumanTree != null) {
 //					floor.eatHumanTree.move(0, SPEED);
@@ -462,9 +448,6 @@ public class MyGameModel extends GameModel {
 				}
 			}
 		}
-		
-//		if(playerDownOnFootBoard)
-//			player.move(0, SPEED);
 
 		drawCount++;
 		if (drawCount % ((int) ((float) 60 / SPEED * BASE_SPEED)) == 0) {
@@ -510,6 +493,7 @@ public class MyGameModel extends GameModel {
 
 			}
 		}
+		
 		if ((event.getAction() == event.ACTION_UP)
 				&& (isPressLeftMoveBtn || isPressRightMoveBtn)) {
 			if (isPressLeftMoveBtn) {
@@ -537,7 +521,6 @@ public class MyGameModel extends GameModel {
 				player.updateBitmap(LEFT);
 			}
 		}
-		// return true;
 	}
 
 	public static boolean gameFlag = true;
@@ -547,9 +530,7 @@ public class MyGameModel extends GameModel {
 		new Thread(new Runnable() {
 			public void run() {
 				Random r = new Random();
-				// int i = r.nextInt(3); //隨機出現三種座標之一
 				int i = 0;
-				// long delayTime =0;
 
 				while (gameFlag) {
 					while (!readyFlag) {
@@ -558,17 +539,9 @@ public class MyGameModel extends GameModel {
 							try {
 								CREATE_FOOTBAR_LOCK.wait();
 							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						}
-						// try {
-						// // Thread.sleep((int)(2000 / ((level + 2.8)*0.35)));
-						// Thread.sleep((long)(BASE_SPEED*2000/SPEED)-delayTime);
-						// } catch (InterruptedException e) {
-						// // TODO Auto-generated catch block
-						// e.printStackTrace();
-						// }
 
 						if (!gameFlag) {
 							break;
@@ -701,18 +674,6 @@ public class MyGameModel extends GameModel {
 									footboardsTheSameLine.add(footboard);
 
 								}
-
-								// else if (i == 1) { // 第二種座標
-								// footboard = new Footboard(getContext(),
-								// currentX,
-								// height, footboardHeight, footboardWidth);
-								// footboards.add(footboard);
-								// } else { // 第三種座標
-								// footboard = new Footboard(getContext(),
-								// currentX,
-								// height, footboardHeight, footboardWidth);
-								// footboards.add(footboard);
-								// }
 
 								tempCurrentXs.add(addX);
 							}
