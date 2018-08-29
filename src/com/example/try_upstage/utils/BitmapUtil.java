@@ -73,6 +73,10 @@ public class BitmapUtil {
 	public static Bitmap eat_human_tree01;
 	public static Bitmap eat_human_tree02;
 	public static Bitmap eat_human_tree03;
+	
+	public static Bitmap restartBtn01;
+	public static Bitmap restartBtn02;
+	public static Bitmap gameover;
 
 	public static void initBitmap(Context context) {
 		BitmapUtil.context = context;
@@ -85,7 +89,7 @@ public class BitmapUtil {
 		
 		
 		
-		int footbarWidth = Common.screenWidth / FOOTBOARD_WIDTH_PERSENT;
+		int footbarWidth = CommonUtil.screenWidth / FOOTBOARD_WIDTH_PERSENT;
 		int playerWidth = footbarWidth / PLAYER_WIDTH_PERSENT;
 		int toolWidth = footbarWidth / TOOL_WIDTH_PERSENT;
 		int fireballWidth = footbarWidth / FIREBALL_WIDTH_PERSENT;
@@ -321,10 +325,10 @@ public class BitmapUtil {
 				(int)((float)player_boy_down_right_bitmap.getHeight()
 						/ player_boy_down_right_bitmap.getWidth() * playerWidth), true);
 		
-		// ´¶³q¦aªO
+		// ï¿½ï¿½ï¿½qï¿½aï¿½O
 		footboard_normal_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.footboard_normal);
-		// ©¹¥ª¦aªO
+		// ï¿½ï¿½ï¿½ï¿½ï¿½aï¿½O
 		footboard_moving_left1_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.footboard_moving_left1);
 		footboard_moving_left2_bitmap = BitmapFactory.decodeResource(
@@ -332,14 +336,14 @@ public class BitmapUtil {
 		footboard_moving_left3_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.footboard_moving_left3);
 		// bitmap = bitmap1;
-		// ©¹¥k¦aªO
+		// ï¿½ï¿½ï¿½kï¿½aï¿½O
 		footboard_moving_right1_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.footboard_moving_right1);
 		footboard_moving_right2_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.footboard_moving_right2);
 		footboard_moving_right3_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.footboard_moving_right3);
-		// ¤£Ã­©w¦aªO
+		// ï¿½ï¿½Ã­ï¿½wï¿½aï¿½O
 		footboard_unstable1_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.footboard_unstable1);
 		footboard_unstable2_bitmap = BitmapFactory.decodeResource(
@@ -347,10 +351,10 @@ public class BitmapUtil {
 		footboard_unstable3_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.footboard_unstable3);
 		// bitmap = bitmap1;
-		// ·Æ°Ê¦aªO
+		// ï¿½Æ°Ê¦aï¿½O
 		footboard_spring_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.footboard_spring);
-		// ³´¨À¦aªO
+		// ï¿½ï¿½ï¿½ï¿½ï¿½aï¿½O
 		footboard_spiked_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), R.drawable.footboard_spiked);
 
@@ -436,6 +440,11 @@ public class BitmapUtil {
 				eat_human_tree03, toolWidth,
 				(int)((float)eat_human_tree03.getHeight()
 						/ eat_human_tree03.getWidth() * toolWidth), true);
+		
+		restartBtn01 = BitmapUtil.createSpecificSizeBitmap(context.getResources().getDrawable(R.drawable.game_restart_btn01), 350, 200);
+		restartBtn02 = BitmapUtil.createSpecificSizeBitmap(context.getResources().getDrawable(R.drawable.game_restart_btn02), 350, 200);
+		
+		gameover = BitmapUtil.createSpecificSizeBitmap(context.getResources().getDrawable(R.drawable.game_over), CommonUtil.screenWidth, (int) (CommonUtil.screenWidth/6.0f));
 	}
 
 	public static Bitmap createSpecificSizeBitmap(Drawable drawable, int width,

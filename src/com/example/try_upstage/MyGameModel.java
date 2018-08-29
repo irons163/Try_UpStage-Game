@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,12 +13,27 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.PorterDuff.Mode;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.try_gameengine.framework.ALayer;
+import com.example.try_gameengine.framework.ButtonLayer;
 import com.example.try_gameengine.framework.Data;
 import com.example.try_gameengine.framework.GameModel;
+import com.example.try_gameengine.framework.LabelLayer;
+import com.example.try_gameengine.framework.Layer;
+import com.example.try_gameengine.framework.LayerManager;
 import com.example.try_gameengine.framework.TouchDispatcher;
+import com.example.try_gameengine.scene.DialogScene;
+import com.example.try_gameengine.utils.GameTimeUtil;
 import com.example.try_upstage.model.Background;
 import com.example.try_upstage.sprites.Controler;
 import com.example.try_upstage.sprites.EatHumanTree;
@@ -27,7 +43,7 @@ import com.example.try_upstage.sprites.Player;
 import com.example.try_upstage.sprites.Player.Dir;
 import com.example.try_upstage.sprites.ToolUtil;
 import com.example.try_upstage.utils.BitmapUtil;
-import com.example.try_upstage.utils.Common;
+import com.example.try_upstage.utils.CommonUtil;
 
 public class MyGameModel extends GameModel {
 	Background background;
@@ -42,14 +58,14 @@ public class MyGameModel extends GameModel {
 	private final Object CREATE_FOOTBAR_LOCK = new Object();
 	int height, width; // 螢幕高寬
 	Floor footboard;
-	private final float BASE_SPEED = (float) Common.screenWidth / 300f;
+	private final float BASE_SPEED = (float) CommonUtil.screenWidth / 300f;
 	float SPEED = BASE_SPEED;
 	int drawCount;
 	Player player;
 	final static int SMOOTH_DEVIATION = 4;
 	public static ToolUtil toolExplodingUtil;
 	float playerMoveSpeed = 0;
-	public static final float MOVESPEED = (float) Common.screenWidth / 66;
+	public static final float MOVESPEED = (float) CommonUtil.screenWidth / 66;
 	public static final float SLIDERSPEED = MOVESPEED / 3;
 	boolean playerDownOnFootBoard = false;
 	boolean playerStandOnFootboard = false;
@@ -65,7 +81,10 @@ public class MyGameModel extends GameModel {
 	Controler controler;
 	boolean isInjure = false;
 	boolean isDrawPlayer = true;
-
+	final static int GAME_TIME = 5;
+	int count;
+	GameTimeUtil gameTimeUtil;
+	
 	public MyGameModel(Context context, Data data) {
 		super(context, data);
 		background = new Background(BitmapFactory.decodeResource(
@@ -77,13 +96,13 @@ public class MyGameModel extends GameModel {
 		floor.setBitmapAndAutoChangeWH(BitmapUtil.floor);
 
 		floors.add(floor);
-		footboardWidth = (int) Common.screenWidth
+		footboardWidth = (int) CommonUtil.screenWidth
 				/ BitmapUtil.FOOTBOARD_WIDTH_PERSENT;
 		footboardHeight = (int) ((float) BitmapUtil.footboard_normal_bitmap
 				.getHeight() / BitmapUtil.footboard_normal_bitmap.getWidth() * footboardWidth);
 
-		width = Common.screenWidth;
-		height = Common.screenHeight;
+		width = CommonUtil.screenWidth;
+		height = CommonUtil.screenHeight;
 
 		currentXs.add(currentX);
 
@@ -92,6 +111,8 @@ public class MyGameModel extends GameModel {
 
 		this.controler = new Controler(context, this.getHeight(),
 				this.getWidth());
+		
+		gameTimeUtil = new GameTimeUtil(1000);
 	}
 
 	public void initFool() {
@@ -109,6 +130,7 @@ public class MyGameModel extends GameModel {
 
 	@Override
 	protected void doDraw(Canvas canvas) {
+		
 		super.doDraw(canvas);
 
 
@@ -116,17 +138,7 @@ public class MyGameModel extends GameModel {
 		controler.paint(canvas);
 
 
-		if(isInjure){
-			life -= 30;
-			if (life < 0) {
-				life = 0;
-			}
-			paint.setColor(Color.RED);
-			paint.setAlpha(100);
-			Rect rect6 = new Rect(0, 0, width, height);
-			canvas.drawRect(rect6, paint);
-		}
-
+                               
 		for (int j = 0; j < footboards.size(); j++) {
 			ArrayList<Floor> f = footboards.get(j);
 			for (int k = 0; k < f.size(); k++) {
@@ -141,7 +153,7 @@ public class MyGameModel extends GameModel {
 						if (isDrawPlayer) {
 							isDrawPlayer = false;
 							player.draw(canvas, SPEED, 0, isInjure);
-							toolExplodingUtil.draw(canvas, SPEED);
+							toolExplodingUtil.draw(canvas, 0);
 						}
 					} else {
 						toolExplodingUtil = null;
@@ -150,11 +162,10 @@ public class MyGameModel extends GameModel {
 				}
 
 				if (toolUtil != null) {
-					toolUtil.draw(canvas, -SPEED);
+					toolUtil.draw(canvas, 0);
 				}
 
 				if (eatHumanTree != null) {
-					eatHumanTree.move(0, SPEED);
 					eatHumanTree.drawSelf(canvas, paint);
 				}
 
@@ -173,8 +184,7 @@ public class MyGameModel extends GameModel {
 		canvas.drawBitmap(bitmap, null, rectTopSpikedBar, null);
 
 		if (topSpikedBarHeight >= player.getY()) {
-			isInjure = true;
-			life = 0;
+			injure(90);
 		}
 
 		float playerDy = 0;
@@ -267,14 +277,14 @@ public class MyGameModel extends GameModel {
 							+ SMOOTH_DEVIATION
 					&& player.getX() < ball.x + ball.fireballWidth
 							- SMOOTH_DEVIATION) {
-				isInjure = true;
-				life = 0;
+				injure(90);
 				if (isDrawPlayer) {
 					isDrawPlayer = false;
 					player.draw(canvas, playerDy, playerDx, isInjure);
 				}
 			}
-			ball.draw(canvas, -(SPEED + SPEED), 0);
+//			ball.draw(canvas, -(SPEED + SPEED), 0);
+			ball.draw(canvas, 0, 0);
 		}
 
 		if (isDrawPlayer) {
@@ -320,16 +330,50 @@ public class MyGameModel extends GameModel {
 		}
 
 		canvas.drawBitmap(lifeBmp, rectLife, rect4, null);
+		
+		drawInjure(canvas);
+		
+		LayerManager.getInstance().drawLayers(canvas, paint);
+	}
+
+	private void injure(int willLoseLife) {
+		isInjure = true;
+		life -= willLoseLife;
+		if (life < 0) {
+			life = 0;
+		}
+	}
+	
+	private void drawInjure(Canvas canvas){
+		if(!isInjure)
+			return;
+		paint.setColor(Color.RED);
+		paint.setAlpha(100);
+		Rect rect6 = new Rect(0, 0, width, height);
+		canvas.drawRect(rect6, paint);
 	}
 
 	@Override
 	protected void process() {
 		super.process();
 		
+		isDrawPlayer = true;
 		TouchDispatcher.getInstance().dispatch();
+		
+		if(!gameFlag)
+			return;
+		
+		if (gameTimeUtil.isArriveExecuteTime()) {
+			if (gameFlag)
+				count++;
+		}
+		
+		if(gameFlag){
+			isGameWinLose();
+		}
 
 		isInjure = false;
-		isDrawPlayer = true;
+		
 		float footboardByPlayerX, footboardByPlayerY = 0;
 		int re = 0;
 		playerStandOnFootboard = false;
@@ -361,14 +405,11 @@ public class MyGameModel extends GameModel {
 									.getX() + SMOOTH_DEVIATION * 4)
 							&& ene.toolNum != Floor.BOMB_EXPLODE) {
 						if (ene.toolNum == Floor.BOMB) {
-							isInjure = true;
+							injure(60);
 							ene.toolNum = Floor.BOMB_EXPLODE;
 							toolExplodingUtil = new ToolUtil(ene.getX(),
 									ene.getY(), Floor.BOMB_EXPLODE);
-							life -= 60;
-							if (life < 0) {
-								life = 0;
-							}
+						
 						} else if (ene.toolNum == Floor.CURE) {
 							life = 90;
 							ene.toolNum = Floor.NOTOOL;
@@ -381,7 +422,7 @@ public class MyGameModel extends GameModel {
 							&& (eatHumanTree.getX() + eatHumanTree.getWidth() > player
 									.getX() + SMOOTH_DEVIATION * 4)) {
 						if (eatHumanTree.eatStartAndDetectHurtPlayer()) {
-							isInjure = true;
+							injure(30);
 						}
 					}
 
@@ -389,7 +430,7 @@ public class MyGameModel extends GameModel {
 						whichFoorbar = 0;
 						playerMoveSpeed = 0;
 						if (ene.which == 5) {
-							isInjure = true;
+							injure(30);
 						}
 						if (ene.which == 1) {
 							whichFoorbar = 1;
@@ -443,9 +484,11 @@ public class MyGameModel extends GameModel {
 				floor.moveByY(-SPEED);
 				floor.frameTrig();
 				if (floor.eatHumanTree != null) {
-//					floor.eatHumanTree.move(0, SPEED);
+					floor.eatHumanTree.move(0, SPEED);
 					floor.eatHumanTree.frameTrig();
 				}
+				if(floor.toolUtil!=null)
+					floor.toolUtil.tool_y += SPEED;
 			}
 		}
 
@@ -458,6 +501,167 @@ public class MyGameModel extends GameModel {
 		}
 
 		player.frameTrig();
+		
+		for(FireBall fireBall : fireballs){
+			fireBall.y += (SPEED + SPEED);
+		}
+	}
+
+	private void isGameWinLose() {
+		if(life==0){
+			showGameOver();
+			count = 0;
+			gameFlag = false;
+		}else if(GAME_TIME - count <= 0) {
+//			showGameWin();
+			showGameOver();
+			count = 0;
+			gameFlag = false;;
+		}
+		
+	}
+	
+	private void showGameOver(){
+		final Layer bgLayer = new Layer(BitmapUtil.gameover, BitmapUtil.gameover.getWidth(), BitmapUtil.gameover.getHeight(), false);
+		bgLayer.setPosition(0, bgLayer.getHeight());
+//		final Sprite restartButton = new Sprite(BitmapUtil.restartBtn01, 350, 200, false);
+		final ButtonLayer restartButton = new ButtonLayer(0, 0, false);
+		final LabelLayer labelLayer = new LabelLayer("hello", 0, 0, false);
+		labelLayer.setTextSize(100);
+		labelLayer.setPosition(500, 500);
+		final ALayer dialog = new ALayer() {
+			
+			@Override
+			public boolean onTouchEvent(MotionEvent event) {
+				// TODO Auto-generated method stub
+				return super.onTouchEvent(event);
+			}
+			
+			@Override
+			public void onTouched(MotionEvent event) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void drawSelf(Canvas canvas, Paint paint) {
+//				canvas.drawColor(Color.TRANSPARENT,Mode.CLEAR);
+				paint = new Paint();
+				paint.setAlpha(150);
+				canvas.drawRect(new RectF(0, 0, CommonUtil.screenWidth, CommonUtil.screenHeight ), paint);
+				
+				bgLayer.drawSelf(canvas, paint);
+				
+				restartButton.drawSelf(canvas, paint);
+				
+				labelLayer.drawSelf(canvas, paint);
+			}
+		};
+		
+		
+		restartButton.setBitmapAndAutoChangeWH(BitmapUtil.restartBtn01);
+		restartButton.setButtonBitmap(BitmapUtil.restartBtn01, BitmapUtil.restartBtn02, BitmapUtil.restartBtn01);
+		restartButton.setPosition(CommonUtil.screenWidth/2.0f - restartButton.getWidth()/2.0f, CommonUtil.screenHeight/4.0f*3);
+		restartButton.setOnClickListener(new ButtonLayer.OnClickListener() {
+			
+			@Override
+			public void onClick(ButtonLayer buttonLayer) {
+				restartGame();
+				dialog.removeFromParent();
+			}
+		});
+		
+		dialog.addChild(restartButton);
+		dialog.setAutoAdd(true);
+	}
+	
+	private void showGameWin(){
+		final Layer bgLayer = new Layer(BitmapUtil.gameover, BitmapUtil.gameover.getWidth(), BitmapUtil.gameover.getHeight(), false);
+		bgLayer.setPosition(0, bgLayer.getHeight());
+//		final ButtonLayer restartButton = new ButtonLayer(0, 0, false);
+		final LabelLayer labelLayer = new LabelLayer("hello", 0, 0, false);
+		labelLayer.setTextSize(100);
+		labelLayer.setPosition(500, 500);
+		
+		final ALayer dialog = new ALayer() {
+			
+			@Override
+			public void onTouched(MotionEvent event) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void drawSelf(Canvas canvas, Paint paint) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+		
+//		ButtonLayer button = new ButtonLayer();
+//		ButtonLayer button2 = new ButtonLayer();
+//
+//		button.setOnClickListener(new ButtonLayer.OnClickListener() {
+//			
+//			@Override
+//			public void onClick(ButtonLayer buttonLayer) {
+//				gameFlag = false;
+//				dialog.removeFromParent();
+//			}
+//		});
+//
+//
+//		button2.setOnClickListener(new ButtonLayer.OnClickListener() {
+//
+//			@Override
+//			public void onClick(ButtonLayer ButtonLayer) {
+//				restartGame();
+//				dialog.removeFromParent();
+//			}
+//		});
+		
+		final ButtonLayer restartButton = new ButtonLayer(0, 0, false);
+		restartButton.setBitmapAndAutoChangeWH(BitmapUtil.restartBtn01);
+		restartButton.setButtonBitmap(BitmapUtil.restartBtn01, BitmapUtil.restartBtn02, BitmapUtil.restartBtn01);
+		restartButton.setPosition(CommonUtil.screenWidth/2.0f - restartButton.getWidth()/2.0f, CommonUtil.screenHeight/4.0f*3);
+		restartButton.setOnClickListener(new ButtonLayer.OnClickListener() {
+			
+			@Override
+			public void onClick(ButtonLayer buttonLayer) {
+				restartGame();
+				dialog.removeFromParent();
+			}
+		});
+
+		dialog.addChild(bgLayer);
+		dialog.addChild(restartButton);
+		dialog.setAutoAdd(true);
+	}
+	
+	private void restartGame(){
+		playerReset();
+		floorReset();
+		lifeReset();
+		fireballReset();
+		paint.setAlpha(255);
+		gameFlag = true;
+	}
+	
+	private void playerReset(){
+		player.setPosition(200, 800);
+		player.updateBitmap(LEFT);
+	}
+
+	private void floorReset(){
+		floors.clear();
+	}
+	
+	private void lifeReset(){
+		life = 90;
+	}
+	
+	private void fireballReset(){
+		fireballs.clear();
 	}
 
 	@Override
@@ -521,6 +725,8 @@ public class MyGameModel extends GameModel {
 				player.updateBitmap(LEFT);
 			}
 		}
+		
+		LayerManager.getInstance().onTouchLayers(event);
 	}
 
 	public static boolean gameFlag = true;

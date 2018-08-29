@@ -1,6 +1,6 @@
 package com.example.try_upstage.model;
 
-import com.example.try_upstage.utils.Common;
+import com.example.try_upstage.utils.CommonUtil;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -26,8 +26,8 @@ public class Background {
 //		bitmapRect = new Rect(x , y - bitmap.getHeight(), x + bitmap.getWidth(), y);
 //		bitmapRect2 = new Rect(x, y, x + bitmap.getWidth(), y + bitmap.getHeight());
 		
-		bitmapRect = new Rect(x , y - Common.screenHeight, x + Common.screenWidth, y);
-		bitmapRect2 = new Rect(x, y, x + Common.screenWidth, y + Common.screenHeight);
+		bitmapRect = new Rect(x , y - CommonUtil.screenHeight, x + CommonUtil.screenWidth, y);
+		bitmapRect2 = new Rect(x, y, x + CommonUtil.screenWidth, y + CommonUtil.screenHeight);
 	}
 	
 	public void update(){

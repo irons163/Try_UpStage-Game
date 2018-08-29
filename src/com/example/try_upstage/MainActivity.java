@@ -8,7 +8,7 @@ import android.view.Window;
 
 import com.example.try_gameengine.stage.BaseStage;
 import com.example.try_upstage.utils.BitmapUtil;
-import com.example.try_upstage.utils.Common;
+import com.example.try_upstage.utils.CommonUtil;
 //import android.support.v7.app.ActionBarActivity;
 
 public class MainActivity extends BaseStage {
@@ -45,15 +45,15 @@ public class MainActivity extends BaseStage {
 	@Override
 	protected void initGame() {
 		// TODO Auto-generated method stub
-		requestWindowFeature(Window.FEATURE_NO_TITLE); // µL¼ÐÃD
+		requestWindowFeature(Window.FEATURE_NO_TITLE); // ï¿½Lï¿½ï¿½ï¿½D
 		
 		setContentView(R.layout.activity_main);
 		
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		
-		Common.screenHeight = dm.heightPixels;
-		Common.screenWidth = dm.widthPixels;
+		CommonUtil.screenHeight = dm.heightPixels;
+		CommonUtil.screenWidth = dm.widthPixels;
 		
 		BitmapUtil.initBitmap(this);
   
